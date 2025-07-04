@@ -1,26 +1,449 @@
+@import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Lora:ital,wght@0,400..700;1,400..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap");
 @import "tailwindcss";
 
+/* CSS Variables - Tailwind v4 style */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --radius: 0.625rem;
+
+  /* Light theme - Ấm áp, thơ mộng, lãng mạn */
+  --background: oklch(0.99 0.005 320);
+  --foreground: oklch(0.25 0.03 300);
+
+  /* Card và popup với tone ấm áp */
+  --card: oklch(0.97 0.01 340 / 0.8);
+  --card-foreground: oklch(0.2 0.04 310);
+  --popover: oklch(0.98 0.008 330 / 0.95);
+  --popover-foreground: oklch(0.22 0.04 310);
+
+  /* Primary colors - Hồng lãng mạn */
+  --primary: oklch(0.65 0.15 340);
+  --primary-foreground: oklch(0.98 0.005 320);
+
+  /* Secondary - Tím nhạt thơ mộng */
+  --secondary: oklch(0.92 0.02 320 / 0.6);
+  --secondary-foreground: oklch(0.3 0.05 310);
+
+  /* Muted - Màu nhạt dịu mắt */
+  --muted: oklch(0.94 0.015 330 / 0.5);
+  --muted-foreground: oklch(0.45 0.04 320);
+
+  /* Accent - Hồng phấn */
+  --accent: oklch(0.88 0.08 350 / 0.7);
+  --accent-foreground: oklch(0.25 0.06 310);
+
+  --destructive: oklch(0.65 0.2 15);
+
+  /* Border và input với tone nhẹ nhàng */
+  --border: oklch(0.85 0.03 330 / 0.4);
+  --input: oklch(0.95 0.015 330 / 0.6);
+  --ring: oklch(0.65 0.15 340);
+
+  /* Chart colors */
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+
+  /* Sidebar - Tone ấm áp cho light theme */
+  --sidebar: oklch(0.95 0.02 340 / 0.8);
+  --sidebar-foreground: oklch(0.2 0.05 310);
+  --sidebar-primary: oklch(0.65 0.15 340);
+  --sidebar-primary-foreground: oklch(0.98 0.005 320);
+  --sidebar-accent: oklch(0.88 0.06 350 / 0.6);
+  --sidebar-accent-foreground: oklch(0.25 0.06 310);
+  --sidebar-border: oklch(0.85 0.03 330 / 0.3);
+  --sidebar-ring: oklch(0.65 0.15 340);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.dark {
+  /* Dark theme - Giữ nguyên */
+  --background: oklch(0.05 0.02 280);
+  --foreground: oklch(0.95 0.02 320);
+  --card: oklch(0.08 0.03 280 / 0.95);
+  --card-foreground: oklch(0.9 0.04 320);
+  --popover: oklch(0.08 0.03 280 / 0.95);
+  --popover-foreground: oklch(0.9 0.04 320);
+  --primary: oklch(0.7 0.18 340);
+  --primary-foreground: oklch(0.1 0.05 280);
+  --secondary: oklch(0.15 0.05 280 / 0.8);
+  --secondary-foreground: oklch(0.85 0.04 320);
+  --muted: oklch(0.12 0.04 280 / 0.7);
+  --muted-foreground: oklch(0.7 0.06 320);
+  --accent: oklch(0.75 0.16 350);
+  --accent-foreground: oklch(0.1 0.05 280);
+  --destructive: oklch(0.7 0.22 20);
+  --border: oklch(0.2 0.08 280 / 0.4);
+  --input: oklch(0.15 0.05 280 / 0.6);
+  --ring: oklch(0.7 0.18 340);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.05 0.03 280 / 0.95);
+  --sidebar-foreground: oklch(0.9 0.04 320);
+  --sidebar-primary: oklch(0.7 0.18 340);
+  --sidebar-primary-foreground: oklch(0.1 0.05 280);
+  --sidebar-accent: oklch(0.15 0.05 280 / 0.8);
+  --sidebar-accent-foreground: oklch(0.85 0.04 320);
+  --sidebar-border: oklch(0.2 0.08 280 / 0.4);
+  --sidebar-ring: oklch(0.7 0.18 340);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Base styles - Tailwind v4 compatible */
+* {
+  border-color: var(--border);
+  outline-color: color-mix(in srgb, var(--ring) 50%, transparent);
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Playfair Display", serif;
+}
+
+/* Font styling */
+h1,
+h2,
+h3 {
+  font-family: "Dancing Script", serif;
+}
+
+p {
+  font-family: "Lora", serif;
+}
+
+/* Custom utility classes - Tailwind v4 style */
+.content-card-hover-light {
+  transition: all 0.3s ease-out;
+}
+
+.content-card-hover-light:hover {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, rgb(255 228 230) 90%, transparent) 0%,
+    color-mix(in srgb, rgb(254 202 202) 70%, transparent) 25%,
+    color-mix(in srgb, rgb(252 165 165) 50%, transparent) 50%,
+    color-mix(in srgb, rgb(251 113 133) 40%, transparent) 75%,
+    color-mix(in srgb, rgb(244 63 94) 30%, transparent) 100%
+  );
+  border-color: color-mix(in srgb, rgb(244 114 182) 70%, transparent);
+  box-shadow: 0 25px 50px -12px color-mix(in srgb, rgb(251 207 232) 30%, transparent);
+}
+
+.content-card-hover-dark {
+  transition: all 0.3s ease-out;
+}
+
+.content-card-hover-dark:hover {
+  background-color: color-mix(in srgb, rgb(15 23 42) 90%, transparent);
+  border-color: color-mix(in srgb, rgb(100 116 139) 30%, transparent);
+  box-shadow: 0 25px 50px -12px color-mix(in srgb, rgb(30 41 59) 30%, transparent);
+}
+
+/* Content card styles - Cải thiện cho light theme */
+.content-card-light {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, rgb(255 228 230) 90%, transparent) 0%,
+    color-mix(in srgb, rgb(254 202 202) 70%, transparent) 25%,
+    color-mix(in srgb, rgb(252 165 165) 50%, transparent) 50%,
+    color-mix(in srgb, rgb(251 113 133) 40%, transparent) 75%,
+    color-mix(in srgb, rgb(244 63 94) 30%, transparent) 100%
+  );
+  backdrop-filter: blur(12px);
+  border: 1px solid color-mix(in srgb, rgb(251 207 232) 50%, transparent);
+  box-shadow: 0 10px 15px -3px color-mix(in srgb, rgb(252 231 243) 40%, transparent);
+}
+
+.dark .content-card-light {
+  background-color: rgba(15, 23, 42, 0.95); /* slate-900/95 */
+  backdrop-filter: blur(12px);
+  border: 1px solid color-mix(in srgb, rgb(71 85 105) 30%, transparent);
+  box-shadow: 0 10px 15px -3px color-mix(in srgb, rgb(30 41 59) 40%, transparent);
+}
+
+/* Gradient animation */
+@keyframes gradient-x {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-gradient-x {
+  animation: gradient-x 15s ease infinite;
+  background-size: 400% 400%;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: color-mix(in srgb, rgb(252 231 243) 50%, transparent);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, rgb(244 114 182) 70%, transparent);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in srgb, rgb(236 72 153) 90%, transparent);
+}
+
+/* Dark theme scrollbar */
+.dark ::-webkit-scrollbar-track {
+  background-color: color-mix(in srgb, rgb(30 41 59) 50%, transparent);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, rgb(236 72 153) 70%, transparent);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in srgb, rgb(236 72 153) 90%, transparent);
+}
+
+/* Smooth transitions */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Focus styles */
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: none;
+}
+
+/* Light theme focus */
+:not(.dark) button:focus-visible,
+:not(.dark) select:focus-visible,
+:not(.dark) input:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, rgb(244 114 182) 60%, transparent),
+    0 0 0 4px white;
+}
+
+/* Dark theme focus */
+.dark button:focus-visible,
+.dark select:focus-visible,
+.dark input:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, rgb(244 114 182) 50%, transparent),
+    0 0 0 4px rgb(15 23 42);
+}
+
+/* Loading animations */
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Custom hover effects cho light theme */
+.light-hover-effect {
+  transition: all 0.3s ease-out;
+}
+
+.light-hover-effect:hover {
+  background-color: color-mix(in srgb, rgb(252 231 243) 60%, transparent);
+  box-shadow: 0 4px 6px -1px color-mix(in srgb, rgb(251 207 232) 30%, transparent);
+  border-color: color-mix(in srgb, rgb(244 114 182) 50%, transparent);
+}
+
+/* Button hover improvements cho light theme */
+.btn-light-hover {
+  background-color: color-mix(in srgb, rgb(253 242 248) 50%, transparent);
+  color: rgb(55 65 81);
+  border: 1px solid color-mix(in srgb, rgb(251 207 232) 40%, transparent);
+  transition: all 0.2s ease-out;
+}
+
+.btn-light-hover:hover {
+  background-color: color-mix(in srgb, rgb(252 231 243) 70%, transparent);
+  color: rgb(31 41 55);
+  border-color: color-mix(in srgb, rgb(244 114 182) 60%, transparent);
+  box-shadow: 0 10px 15px -3px color-mix(in srgb, rgb(251 207 232) 40%, transparent);
+}
+
+.btn-light-hover:active {
+  background-color: color-mix(in srgb, rgb(251 207 232) 50%, transparent);
+  transform: scale(0.95);
+}
+
+/* Sidebar button hover cho light theme */
+.sidebar-btn-light {
+  color: rgb(55 65 81);
+  background-color: transparent;
+  border: 1px solid transparent;
+  transition: all 0.2s ease-out;
+}
+
+.sidebar-btn-light:hover {
+  background-color: color-mix(in srgb, rgb(252 231 243) 60%, transparent);
+  color: rgb(31 41 55);
+  border-color: color-mix(in srgb, rgb(244 114 182) 40%, transparent);
+}
+
+.sidebar-btn-light:active {
+  background-color: color-mix(in srgb, rgb(251 207 232) 50%, transparent);
+}
+
+/* Icon button hover cho light theme */
+.icon-btn-light {
+  color: rgb(75 85 99);
+  background-color: color-mix(in srgb, white 80%, transparent);
+  border: 1px solid color-mix(in srgb, rgb(251 207 232) 40%, transparent);
+  transition: all 0.2s ease-out;
+}
+
+.icon-btn-light:hover {
+  background-color: color-mix(in srgb, rgb(253 242 248) 80%, transparent);
+  color: rgb(31 41 55);
+  border-color: color-mix(in srgb, rgb(244 114 182) 60%, transparent);
+  box-shadow: 0 4px 6px -1px color-mix(in srgb, rgb(251 207 232) 30%, transparent);
+}
+
+.icon-btn-light:active {
+  background-color: color-mix(in srgb, rgb(252 231 243) 60%, transparent);
+  transform: scale(0.95);
+}
+
+/* Glass effect cho light theme */
+.glass-light {
+  background-color: color-mix(in srgb, white 70%, transparent);
+  backdrop-filter: blur(8px);
+  border: 1px solid color-mix(in srgb, rgb(251 207 232) 50%, transparent);
+  box-shadow: 0 10px 15px -3px color-mix(in srgb, rgb(252 231 243) 40%, transparent);
+}
+
+.glass-light-hover {
+  transition: all 0.3s ease-out;
+}
+
+.glass-light-hover:hover {
+  background-color: color-mix(in srgb, white 80%, transparent);
+  border-color: color-mix(in srgb, rgb(244 114 182) 60%, transparent);
+  box-shadow: 0 25px 50px -12px color-mix(in srgb, rgb(251 207 232) 50%, transparent);
+}
+
+/* Text colors cho light theme */
+.text-light-primary {
+  color: rgb(31 41 55);
+}
+
+.text-light-secondary {
+  color: rgb(75 85 99);
+}
+
+.text-light-muted {
+  color: rgb(107 114 128);
+}
+
+/* Dark theme styles */
+.dark .sidebar-btn-dark {
+  color: rgb(252 231 243);
+  background-color: transparent;
+  border: 1px solid transparent;
+  transition: all 0.2s ease-out;
+}
+
+.dark .sidebar-btn-dark:hover {
+  background-color: color-mix(in srgb, rgb(131 24 67) 30%, transparent);
+  color: rgb(251 207 232);
+  border-color: color-mix(in srgb, rgb(236 72 153) 40%, transparent);
+}
+
+.dark .sidebar-btn-dark:active {
+  background-color: color-mix(in srgb, rgb(157 23 77) 50%, transparent);
+}
+
+.dark .icon-btn-dark {
+  color: rgb(252 231 243);
+  background-color: color-mix(in srgb, black 30%, transparent);
+  border: 1px solid color-mix(in srgb, rgb(157 23 77) 40%, transparent);
+  transition: all 0.2s ease-out;
+}
+
+.dark .icon-btn-dark:hover {
+  background-color: color-mix(in srgb, rgb(131 24 67) 40%, transparent);
+  color: rgb(251 207 232);
+  border-color: color-mix(in srgb, rgb(219 39 119) 60%, transparent);
+  box-shadow: 0 4px 6px -1px color-mix(in srgb, rgb(131 24 67) 30%, transparent);
+}
+
+.dark .icon-btn-dark:active {
+  background-color: color-mix(in srgb, rgb(157 23 77) 50%, transparent);
+  transform: scale(0.95);
+}
+
+/* Romantic gradient backgrounds */
+.bg-romantic-light {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, rgb(255 240 245) 80%, transparent) 0%,
+    color-mix(in srgb, rgb(255 228 230) 60%, transparent) 25%,
+    color-mix(in srgb, rgb(254 202 202) 40%, transparent) 50%,
+    color-mix(in srgb, rgb(252 165 165) 30%, transparent) 75%,
+    color-mix(in srgb, rgb(251 113 133) 20%, transparent) 100%
+  );
+}
+
+.bg-romantic-hover {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, rgb(255 228 230) 90%, transparent) 0%,
+    color-mix(in srgb, rgb(254 202 202) 70%, transparent) 25%,
+    color-mix(in srgb, rgb(252 165 165) 50%, transparent) 50%,
+    color-mix(in srgb, rgb(251 113 133) 40%, transparent) 75%,
+    color-mix(in srgb, rgb(244 63 94) 30%, transparent) 100%
+  );
+}
+.dark .bg-romantic-light {
+  background: none; /* Xóa gradient trong dark mode */
+}
+
+.bg-sidebar-dark {
+  background-color: rgba(15, 23, 42, 0.95); /* slate-900/95 */
+  background-image: none;
+}
+
+.gallery-loading-light {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, rgb(255 240 245) 80%, transparent) 0%,
+    color-mix(in srgb, rgb(255 228 230) 60%, transparent) 25%,
+    color-mix(in srgb, rgb(254 202 202) 40%, transparent) 50%,
+    color-mix(in srgb, rgb(252 165 165) 30%, transparent) 75%,
+    color-mix(in srgb, rgb(251 113 133) 20%, transparent) 100%
+  );
+  backdrop-filter: blur(12px);
+  border: 1px solid color-mix(in srgb, rgb(251 207 232) 50%, transparent);
+}
+
+.dark .gallery-loading-light {
+  background: none;
+}
+
+.gallery-loading-dark {
+  background-color: rgba(15, 23, 42, 0.95); /* slate-900/95 */
+  background-image: none;
+  backdrop-filter: blur(12px);
+  border: 1px solid color-mix(in srgb, rgb(71 85 105) 30%, transparent);
 }
