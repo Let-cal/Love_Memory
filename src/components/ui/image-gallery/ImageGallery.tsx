@@ -147,6 +147,16 @@ export default function ImageGallery() {
     console.log("Create new group");
   };
 
+  const handleImageUpdated = async (updatedImage: ImageDataProps) => {
+    try {
+      console.log("Image updated:", updatedImage);
+      // Refetch the images to get the updated data from the server
+      await refetch();
+    } catch (error) {
+      console.error("Error refreshing images after update:", error);
+    }
+  };
+
   const onChangeGroup = async (imageId: number | string, groupId: string) => {
     try {
       console.log("Change group:", imageId, "to", groupId);
@@ -231,6 +241,7 @@ export default function ImageGallery() {
             onEdit={handleEdit}
             onDelete={handleDelete}
             onChangeGroup={onChangeGroup}
+            onImageUpdated={handleImageUpdated}
           />
         )}
         {viewMode === "grid" && (
@@ -241,6 +252,7 @@ export default function ImageGallery() {
             onEdit={handleEdit}
             onDelete={handleDelete}
             onChangeGroup={onChangeGroup}
+            onImageUpdated={handleImageUpdated}
           />
         )}
         {viewMode === "timeline" && (
@@ -251,6 +263,7 @@ export default function ImageGallery() {
             onEdit={handleEdit}
             onDelete={handleDelete}
             onChangeGroup={onChangeGroup}
+            onImageUpdated={handleImageUpdated}
           />
         )}
 

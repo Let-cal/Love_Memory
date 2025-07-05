@@ -12,6 +12,7 @@ interface CarouselViewProps {
   onEdit: (id: string | number) => void;
   onDelete: (id: string | number) => void;
   onChangeGroup: (imageId: string | number, groupId: string) => void;
+  onImageUpdated: (updatedImage: ImageDataProps) => void;
 }
 
 export default function CarouselView({
@@ -21,6 +22,7 @@ export default function CarouselView({
   onEdit,
   onDelete,
   onChangeGroup,
+  onImageUpdated,
 }: CarouselViewProps) {
   const [activeCardIndex, setActiveCardIndex] = useState<number | null>(null);
   const [isHovering, setIsHovering] = useState(false);
@@ -75,6 +77,7 @@ export default function CarouselView({
                 onDelete={onDelete}
                 onChangeGroup={onChangeGroup}
                 viewMode="carousel"
+                onImageUpdated={onImageUpdated}
               />
             </div>
           ))}
@@ -117,6 +120,7 @@ export default function CarouselView({
                 onDelete={onDelete}
                 onChangeGroup={onChangeGroup}
                 viewMode="carousel"
+                onImageUpdated={onImageUpdated}
               />
             </div>
           </div>

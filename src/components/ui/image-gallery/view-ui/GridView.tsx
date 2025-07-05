@@ -10,6 +10,7 @@ interface GridViewProps {
   onEdit: (id: string | number) => void;
   onDelete: (id: string | number) => void;
   onChangeGroup: (imageId: string | number, groupId: string) => void;
+  onImageUpdated: (updatedImage: ImageDataProps) => void;
 }
 
 export default function GridView({
@@ -19,6 +20,7 @@ export default function GridView({
   onEdit,
   onDelete,
   onChangeGroup,
+  onImageUpdated,
 }: GridViewProps) {
   return (
     <div className="p-4 md:p-6 lg:p-8">
@@ -37,6 +39,7 @@ export default function GridView({
               onDelete={onDelete}
               onChangeGroup={onChangeGroup}
               viewMode="grid"
+              onImageUpdated={onImageUpdated}
             />
           </div>
         ))}

@@ -1,8 +1,8 @@
 "use client";
 
+import { ImageDataProps, ImageGroupProps } from "@/types/types";
 import { Calendar } from "lucide-react";
 import { ImageItem } from "../ImageItem";
-import { ImageDataProps, ImageGroupProps } from "@/types/types";
 
 interface TimelineViewProps {
   groupedImages: { [key: string]: ImageDataProps[] };
@@ -11,6 +11,7 @@ interface TimelineViewProps {
   onEdit: (id: string | number) => void;
   onDelete: (id: string | number) => void;
   onChangeGroup: (imageId: string | number, groupId: string) => void;
+  onImageUpdated: (updatedImage: ImageDataProps) => void;
 }
 
 export default function TimelineView({
@@ -20,6 +21,7 @@ export default function TimelineView({
   onEdit,
   onDelete,
   onChangeGroup,
+  onImageUpdated,
 }: TimelineViewProps) {
   const sortedDates = Object.keys(groupedImages).sort(
     (a, b) => new Date(b).getTime() - new Date(a).getTime()
@@ -65,6 +67,7 @@ export default function TimelineView({
                   onDelete={onDelete}
                   onChangeGroup={onChangeGroup}
                   viewMode="timeline"
+                  onImageUpdated={onImageUpdated}
                 />
               </div>
             ))}
