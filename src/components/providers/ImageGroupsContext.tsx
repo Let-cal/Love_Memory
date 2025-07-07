@@ -1,8 +1,22 @@
-// hooks/image-gallery/useGetImageGroups.ts
-import { useState, useEffect } from 'react';
+// context/ImageGroupsContext.tsx
+"use client";
+
+import { createContext, useContext, useEffect, useState } from 'react';
 import { ImageGroupProps } from '@/types/types';
 
-export function useGetImageGroups(fetchOnMount: boolean = false) {
+interface ImageGroupsContextType {
+  groups: ImageGroupProps[];
+  isLoading: boolean;
+  error: string | null;
+  refetch: () => void;
+  addGroup: (newGroup: ImageGroupProps) => void;
+  updateGroup: (updatedGroup: ImageGroupProps) => void;
+  removeGroup: (groupId: string) => void;
+}
+
+const ImageGroupsContext = createContext<ImageGroupsContextType | null>(null);
+
+export function ImageGroupsProvider({ children }: { children: React.ReactNode }) {
   const [groups, setGroups] = useState<ImageGroupProps[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -29,11 +43,9 @@ export function useGetImageGroups(fetchOnMount: boolean = false) {
     }
   };
 
- useEffect(() => {
-    if (fetchOnMount) {
-      fetchGroups();
-    }
-  }, [fetchOnMount]);
+  useEffect(() => {
+    fetchGroups(); // Fetch dữ liệu khi provider được mount (tức là khi trang load)
+  }, []);
 
   const addGroup = (newGroup: ImageGroupProps) => {
     setGroups(prev => [...prev, newGroup].sort((a, b) => a.name.localeCompare(b.name)));
@@ -51,15 +63,31 @@ export function useGetImageGroups(fetchOnMount: boolean = false) {
     setGroups(prev => prev.filter(group => group.id !== groupId));
   };
 
-  return {
-    groups,
-    isLoading,
-    error,
-    refetch: fetchGroups,
-    addGroup,
-    updateGroup,
-    removeGroup,
-    clearError: () => setError(null),
+  const refetch = () => {
+    fetchGroups();
   };
+
+  return (
+    <ImageGroupsContext.Provider
+      value={{
+        groups,
+        isLoading,
+        error,
+        refetch,
+        addGroup,
+        updateGroup,
+        removeGroup,
+      }}
+    >
+      {children}
+    </ImageGroupsContext.Provider>
+  );
 }
 
+export function useImageGroups() {
+  const context = useContext(ImageGroupsContext);
+  if (!context) {
+    throw new Error('useImageGroups must be used within an ImageGroupsProvider');
+  }
+  return context;
+}

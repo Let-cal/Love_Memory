@@ -8,6 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useDeleteImage } from "@/hooks/image-gallery/useDeleteImage";
 import { useToggleFavorite } from "@/hooks/image-gallery/useToggleFavorite";
 import { cn } from "@/lib/utils";
 import { ImageDataProps, ImageGroupProps } from "@/types/types";
@@ -22,6 +23,7 @@ import {
 import Image from "next/image";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
+import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
 import { EditImageDialog } from "./EditImageDialog";
 
 interface ImageItemProps {
@@ -49,15 +51,16 @@ export function ImageItem({
   const imageId = image._id ? image._id.toString() : image.id.toString();
   const currentGroupId = image.group?.toString();
 
-  // Edit dialog state
+  // Dialog states
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  // Optimistic UI state
+  // Optimistic UI state for favorites
   const [optimisticFavorite, setOptimisticFavorite] = useState<boolean | null>(
     null
   );
 
-  // Use the custom hook with success/error callbacks
+  // Use the custom hooks
   const { toggleFavorite, isToggling } = useToggleFavorite(
     // onSuccess callback
     (id, newStatus) => {
@@ -75,10 +78,23 @@ export function ImageItem({
     }
   );
 
+  const { deleteImage, isDeletingImage } = useDeleteImage({
+    onSuccess: (deletedImageId) => {
+      setIsDeleteDialogOpen(false);
+      onDelete(deletedImageId); // Call parent callback to update global state
+      toast.success("Photo deleted successfully");
+    },
+    onError: (error) => {
+      console.error("Failed to delete image:", error);
+      toast.error("Failed to delete photo. Please try again.");
+    },
+  });
+
   // Determine the current favorite status (optimistic or actual)
   const currentFavoriteStatus =
     optimisticFavorite !== null ? optimisticFavorite : image.isFavorite;
   const isCurrentlyToggling = isToggling(imageId);
+  const isCurrentlyDeleting = isDeletingImage(imageId);
 
   // Handle favorite toggle with optimistic UI
   const handleToggleFavorite = useCallback(async () => {
@@ -114,6 +130,23 @@ export function ImageItem({
     },
     [onImageUpdated]
   );
+
+  // Handle delete button click
+  const handleDeleteClick = useCallback(() => {
+    setIsDeleteDialogOpen(true);
+  }, []);
+
+  // Handle delete confirmation
+  const handleDeleteConfirm = useCallback(async () => {
+    await deleteImage(imageId);
+  }, [deleteImage, imageId]);
+
+  // Handle delete dialog close
+  const handleDeleteDialogClose = useCallback(() => {
+    if (!isCurrentlyDeleting) {
+      setIsDeleteDialogOpen(false);
+    }
+  }, [isCurrentlyDeleting]);
 
   return (
     <>
@@ -169,16 +202,22 @@ export function ImageItem({
           <Button
             size="sm"
             onClick={handleEditClick}
-            className="h-9 w-9 p-0 rounded-full bg-blue-500/90 hover:bg-blue-600/90 text-white transition-all duration-200"
+            disabled={isCurrentlyDeleting}
+            className="h-9 w-9 p-0 rounded-full bg-blue-500/90 hover:bg-blue-600/90 text-white transition-all duration-200 disabled:opacity-50"
           >
             <Edit className="h-4 w-4" />
           </Button>
           <Button
             size="sm"
-            onClick={() => onDelete(imageId)}
-            className="h-9 w-9 p-0 rounded-full bg-red-500/90 hover:bg-red-600/90 text-white transition-all duration-200"
+            onClick={handleDeleteClick}
+            disabled={isCurrentlyDeleting}
+            className="h-9 w-9 p-0 rounded-full bg-red-500/90 hover:bg-red-600/90 text-white transition-all duration-200 disabled:opacity-50"
           >
-            <Trash2 className="h-4 w-4" />
+            {isCurrentlyDeleting ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Trash2 className="h-4 w-4" />
+            )}
           </Button>
         </div>
 
@@ -201,10 +240,11 @@ export function ImageItem({
             >
               <DropdownMenuItem
                 onClick={handleToggleFavorite}
-                disabled={isCurrentlyToggling}
+                disabled={isCurrentlyToggling || isCurrentlyDeleting}
                 className={cn(
                   "hover:bg-slate-800/80 focus:bg-slate-800/80 cursor-pointer touch-manipulation py-3",
-                  isCurrentlyToggling && "opacity-50 cursor-not-allowed"
+                  (isCurrentlyToggling || isCurrentlyDeleting) &&
+                    "opacity-50 cursor-not-allowed"
                 )}
               >
                 {isCurrentlyToggling ? (
@@ -224,7 +264,8 @@ export function ImageItem({
 
               <DropdownMenuItem
                 onClick={handleEditClick}
-                className="hover:bg-slate-800/80 focus:bg-slate-800/80 cursor-pointer touch-manipulation py-3"
+                disabled={isCurrentlyDeleting}
+                className="hover:bg-slate-800/80 focus:bg-slate-800/80 cursor-pointer touch-manipulation py-3 disabled:opacity-50"
               >
                 <Edit className="mr-2 h-4 w-4" />
                 Edit photo
@@ -241,8 +282,9 @@ export function ImageItem({
                 {/* Ungrouped option */}
                 <DropdownMenuItem
                   onClick={() => onChangeGroup(imageId, "ungrouped")}
+                  disabled={isCurrentlyDeleting}
                   className={cn(
-                    "hover:bg-slate-800/80 focus:bg-slate-800/80 cursor-pointer touch-manipulation py-2 pl-4",
+                    "hover:bg-slate-800/80 focus:bg-slate-800/80 cursor-pointer touch-manipulation py-2 pl-4 disabled:opacity-50",
                     !currentGroupId && "bg-pink-500/20 text-pink-200"
                   )}
                 >
@@ -257,8 +299,9 @@ export function ImageItem({
                     <DropdownMenuItem
                       key={groupId}
                       onClick={() => onChangeGroup(imageId, groupId)}
+                      disabled={isCurrentlyDeleting}
                       className={cn(
-                        "hover:bg-slate-800/80 focus:bg-slate-800/80 cursor-pointer touch-manipulation py-2 pl-4",
+                        "hover:bg-slate-800/80 focus:bg-slate-800/80 cursor-pointer touch-manipulation py-2 pl-4 disabled:opacity-50",
                         currentGroupId === groupId &&
                           "bg-pink-500/20 text-pink-200"
                       )}
@@ -278,10 +321,15 @@ export function ImageItem({
               <DropdownMenuSeparator className="bg-slate-700/50" />
 
               <DropdownMenuItem
-                onClick={() => onDelete(imageId)}
-                className="hover:bg-red-500/20 focus:bg-red-500/20 cursor-pointer touch-manipulation py-3 text-red-400"
+                onClick={handleDeleteClick}
+                disabled={isCurrentlyDeleting}
+                className="hover:bg-red-500/20 focus:bg-red-500/20 cursor-pointer touch-manipulation py-3 text-red-400 disabled:opacity-50"
               >
-                <Trash2 className="mr-2 h-4 w-4" />
+                {isCurrentlyDeleting ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Trash2 className="mr-2 h-4 w-4" />
+                )}
                 Delete photo
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -334,6 +382,15 @@ export function ImageItem({
         isOpen={isEditDialogOpen}
         onClose={handleEditDialogClose}
         onImageUpdated={handleImageUpdated}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmationDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={handleDeleteDialogClose}
+        onConfirm={handleDeleteConfirm}
+        image={image}
+        isDeleting={isCurrentlyDeleting}
       />
     </>
   );

@@ -1,13 +1,21 @@
 "use client";
 
+import { useSidebar } from "@/components/providers/sidebar-context";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import {
   ChevronLeft,
   ChevronRight,
   ExternalLink,
   Gift,
+  HeartHandshake,
   Images,
   Menu,
   Sparkles,
@@ -17,19 +25,21 @@ import React, { useState } from "react";
 import { ThemeToggle } from "./theme-toggle";
 
 interface SidebarProps {
-  expanded: boolean;
-  onToggle: () => void;
   className?: string;
 }
 
-export function Sidebar({ expanded, onToggle, className }: SidebarProps) {
+export function Sidebar({ className }: SidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { expanded, toggleExpanded } = useSidebar();
 
   // Mobile sidebar content
   const MobileSidebarContent = () => (
-    <div className="flex flex-col h-full bg-romantic-light dark:bg-sidebar-dark text-gray-800 dark:text-white">
+    <div className="flex flex-col h-full content-card-light dark:content-card-light text-gray-800 dark:text-white">
+      <VisuallyHidden>
+        <SheetTitle>Sidebar Navigation</SheetTitle> {/* Thêm SheetTitle ẩn */}
+      </VisuallyHidden>
       <SidebarHeader expanded={true} onToggle={() => setMobileOpen(false)} />
       <SidebarContent expanded={true} pathname={pathname} router={router} />
       <SidebarGroup expanded={true} pathname={pathname} router={router} />
@@ -48,7 +58,7 @@ export function Sidebar({ expanded, onToggle, className }: SidebarProps) {
             <Button
               variant="ghost"
               size="sm"
-              className="fixed top-4 left-4 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm text-gray-800 dark:text-white hover:bg-gray-100/90 dark:hover:bg-slate-800/90 border border-gray-200/50 dark:border-slate-700/50"
+              className="fixed top-4 left-4 z-50 content-card-light dark:content-card-light backdrop-blur-xl border-r border-pink-200/50 dark:border-slate-700/30"
             >
               <Menu className="h-5 w-5" />
             </Button>
@@ -63,14 +73,14 @@ export function Sidebar({ expanded, onToggle, className }: SidebarProps) {
       <div
         className={cn(
           "hidden lg:flex relative h-full flex-col",
-          "bg-romantic-light dark:bg-sidebar-dark backdrop-blur-xl border-r border-pink-200/50 dark:border-slate-700/30",
+          "content-card-light dark:content-card-light backdrop-blur-xl border-r border-pink-200/50 dark:border-slate-700/30",
           "shadow-2xl shadow-black/10 dark:shadow-black/30",
           "transition-all duration-300 ease-in-out",
           expanded ? "min-w-64" : "min-w-16",
           className
         )}
       >
-        <SidebarHeader expanded={expanded} onToggle={onToggle} />
+        <SidebarHeader expanded={expanded} onToggle={toggleExpanded} />
         <SidebarContent
           expanded={expanded}
           pathname={pathname}
@@ -147,14 +157,14 @@ function SidebarContent({
     {
       icon: ExternalLink,
       label: "Web Gallery",
-      href: "/user/profile",
-      active: pathname === "/user/profile",
+      href: "/user/web-gallery",
+      active: pathname === "/user/web-gallery",
     },
     {
       icon: Gift,
       label: "Wishes",
-      href: "/Gift",
-      active: pathname === "/Gift",
+      href: "/user/wishes",
+      active: pathname === "/user/wishes",
     },
   ];
 
@@ -191,19 +201,12 @@ function SidebarGroup({
   pathname: string | null;
   router: ReturnType<typeof useRouter>;
 }) {
+  console.log("Current pathname:", pathname);
   const groupItems = [
     {
-      icon: ExternalLink,
+      icon: HeartHandshake,
       label: "Profile",
       href: "/user/profile",
-      count: 14,
-      active: pathname === "/user/profile",
-    },
-    {
-      icon: Gift,
-      label: "Projects",
-      href: "/user/profile",
-      count: 14,
       active: pathname === "/user/profile",
     },
   ];
@@ -223,7 +226,7 @@ function SidebarGroup({
             icon={item.icon}
             label={item.label}
             expanded={expanded}
-            badge={item.count}
+            active={item.active}
             onClick={() => {
               router.push(item.href);
             }}

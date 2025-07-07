@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { ImageDataProps, ImageGroupProps } from "@/types/types";
 import { useCallback, useRef, useState } from "react";
 import { ImageItem } from "../ImageItem";
+import { PaginationComponent } from "@/components/ui/PaginationComponent";
 
 interface CarouselViewProps {
   images: ImageDataProps[];
@@ -13,6 +14,11 @@ interface CarouselViewProps {
   onDelete: (id: string | number) => void;
   onChangeGroup: (imageId: string | number, groupId: string) => void;
   onImageUpdated: (updatedImage: ImageDataProps) => void;
+  // Pagination props
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  onPageChange: (page: number) => void;
 }
 
 export default function CarouselView({
@@ -23,6 +29,10 @@ export default function CarouselView({
   onDelete,
   onChangeGroup,
   onImageUpdated,
+  currentPage,
+  totalPages,
+  totalItems,
+  onPageChange,
 }: CarouselViewProps) {
   const [activeCardIndex, setActiveCardIndex] = useState<number | null>(null);
   const [isHovering, setIsHovering] = useState(false);
@@ -60,72 +70,88 @@ export default function CarouselView({
   };
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 min-h-screen">
-      {/* Mobile/Tablet Grid Layout */}
-      <div className="block lg:hidden">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-          {images.map((image) => (
+    <div className="min-h-screen">
+      <div className="p-4 md:p-6 lg:p-8">
+        {/* Mobile/Tablet Grid Layout */}
+        <div className="block lg:hidden">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            {images.map((image) => (
+              <div
+                key={image.id}
+                className="aspect-[3/4] rounded-xl overflow-hidden shadow-xl border border-slate-700/50"
+              >
+                <ImageItem
+                  image={image}
+                  groups={groups}
+                  onToggleFavorite={onToggleFavorite}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                  onChangeGroup={onChangeGroup}
+                  viewMode="carousel"
+                  onImageUpdated={onImageUpdated}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Desktop Carousel Layout */}
+        <div
+          className="hidden lg:flex gap-1 overflow-x-auto items-start justify-center min-h-[600px] snap-x snap-mandatory px-4"
+          onMouseLeave={handleContainerMouseLeave}
+        >
+          {images.map((image, index) => (
             <div
               key={image.id}
-              className="aspect-[3/4] rounded-xl overflow-hidden shadow-xl border border-slate-700/50"
+              className={cn(
+                // Base styles
+                "relative flex-1 min-w-[60px] h-[600px] cursor-pointer",
+                // Transitions
+                "transition-all duration-[600ms] ease-[cubic-bezier(0.25,1,0.5,1)]",
+                // Responsive behavior
+                isHovering
+                  ? activeCardIndex === index
+                    ? "opacity-100 flex-[0_0_30%]" // Active card
+                    : "opacity-20" // Non-active cards
+                  : "opacity-100", // Default state
+                // Margin patterns
+                getCardStyle(index),
+                // Snap behavior
+                "snap-center"
+              )}
+              onMouseEnter={() => handleMouseEnter(index)}
+              onMouseLeave={handleMouseLeave}
             >
-              <ImageItem
-                image={image}
-                groups={groups}
-                onToggleFavorite={onToggleFavorite}
-                onEdit={onEdit}
-                onDelete={onDelete}
-                onChangeGroup={onChangeGroup}
-                viewMode="carousel"
-                onImageUpdated={onImageUpdated}
-              />
+              <div className="h-full w-full rounded-lg overflow-hidden shadow-xl border border-slate-700/50">
+                <ImageItem
+                  image={image}
+                  groups={groups}
+                  onToggleFavorite={onToggleFavorite}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                  onChangeGroup={onChangeGroup}
+                  viewMode="carousel"
+                  onImageUpdated={onImageUpdated}
+                />
+              </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Desktop Carousel Layout */}
-      <div
-        className="hidden lg:flex gap-1 overflow-x-auto items-start justify-center min-h-[600px] snap-x snap-mandatory px-4"
-        onMouseLeave={handleContainerMouseLeave}
-      >
-        {images.map((image, index) => (
-          <div
-            key={image.id}
-            className={cn(
-              // Base styles
-              "relative flex-1 min-w-[60px] h-[600px] cursor-pointer",
-              // Transitions
-              "transition-all duration-[600ms] ease-[cubic-bezier(0.25,1,0.5,1)]",
-              // Responsive behavior
-              isHovering
-                ? activeCardIndex === index
-                  ? "opacity-100 flex-[0_0_30%]" // Active card
-                  : "opacity-20" // Non-active cards
-                : "opacity-100", // Default state
-              // Margin patterns
-              getCardStyle(index),
-              // Snap behavior
-              "snap-center"
-            )}
-            onMouseEnter={() => handleMouseEnter(index)}
-            onMouseLeave={handleMouseLeave}
-          >
-            <div className="h-full w-full rounded-lg overflow-hidden shadow-xl border border-slate-700/50">
-              <ImageItem
-                image={image}
-                groups={groups}
-                onToggleFavorite={onToggleFavorite}
-                onEdit={onEdit}
-                onDelete={onDelete}
-                onChangeGroup={onChangeGroup}
-                viewMode="carousel"
-                onImageUpdated={onImageUpdated}
-              />
-            </div>
-          </div>
-        ))}
-      </div>
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="pb-6 px-4 md:px-6 lg:px-8">
+          <PaginationComponent
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            onPageChange={onPageChange}
+            itemsPerPage={8}
+            itemType="photo"
+          />
+        </div>
+      )}
     </div>
   );
 }

@@ -15,12 +15,12 @@ cloudinary.config({
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await dbConnect();
-
-    const { id } = params;
+    const resolvedParams = await params;
+    const { id } = resolvedParams;
 
     // Validate ObjectId
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -30,7 +30,7 @@ export async function DELETE(
       );
     }
 
-    // Find the image
+    // Find the image first to get cloudinary public ID and group info
     const image = await Image.findById(id);
     if (!image) {
       return NextResponse.json(
@@ -39,20 +39,49 @@ export async function DELETE(
       );
     }
 
-    // Delete from Cloudinary
+    // Store group ID for potential cleanup
+    const groupId = image.group;
+
+    // Delete from Cloudinary first
     try {
       await cloudinary.uploader.destroy(image.cloudinaryPublicId);
+      console.log(
+        `Successfully deleted image from Cloudinary: ${image.cloudinaryPublicId}`
+      );
     } catch (cloudinaryError) {
       console.error("Error deleting from Cloudinary:", cloudinaryError);
       // Continue with database deletion even if Cloudinary fails
+      // This ensures we don't leave orphaned database records
     }
 
     // Delete from database
     await Image.findByIdAndDelete(id);
 
+    // Optional: If the group now has no images, you might want to handle this
+    // For now, we'll just let empty groups exist, but you could add logic here
+    if (groupId) {
+      const remainingImagesInGroup = await Image.countDocuments({
+        group: groupId,
+      });
+      console.log(`Group ${groupId} now has ${remainingImagesInGroup} images`);
+
+      // Uncomment the following lines if you want to delete empty groups automatically
+      // if (remainingImagesInGroup === 0) {
+      //   await ImageGroup.findByIdAndDelete(groupId);
+      //   console.log(`Deleted empty group: ${groupId}`);
+      // }
+    }
+
     return NextResponse.json({
       success: true,
-      data: { id },
+      data: {
+        id,
+        deletedFrom: {
+          database: true,
+          cloudinary: true,
+        },
+        message: "Image deleted successfully",
+      },
     });
   } catch (error) {
     console.error("Error deleting image:", error);

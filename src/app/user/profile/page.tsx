@@ -3,7 +3,7 @@ import { Layout } from "@/components/layout/layout";
 export default function ProfilePage() {
   return (
     <Layout videoSrc="/love_background.mp4">
-      <div className="content-card-light dark:content-card-dark rounded-lg p-6 shadow-2xl">
+      <div className="content-card-light dark:content-card-light rounded-lg p-6 shadow-2xl">
         <h1 className="text-3xl font-bold text-white dark:text-slate-100 mb-4">
           Profile
         </h1>

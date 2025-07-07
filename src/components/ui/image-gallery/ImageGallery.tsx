@@ -14,6 +14,13 @@ import CarouselView from "./view-ui/CarouselView";
 import GridView from "./view-ui/GridView";
 import TimelineView from "./view-ui/TimelineView";
 
+// Pagination configuration per view
+const PAGINATION_CONFIG = {
+  carousel: 8,
+  grid: 28,
+  timeline: 5, // 5 date headers per page
+};
+
 export default function ImageGallery() {
   // UI state
   const [selectedGroup, setSelectedGroup] = useState<string>("all");
@@ -22,15 +29,19 @@ export default function ImageGallery() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
+  // Pagination state per view
+  const [paginationState, setPaginationState] = useState({
+    carousel: 1,
+    grid: 1,
+    timeline: 1,
+  });
+
   // Fetch images using the hook
   const {
     images: fetchedImages,
     groups: fetchedGroups,
     loading,
     error,
-    pagination,
-    loadMore,
-    hasMore,
     refetch,
   } = useGetImages({
     enabled: true,
@@ -120,6 +131,81 @@ export default function ImageGallery() {
     return grouped;
   }, [filteredAndSortedImages]);
 
+  // Pagination logic per view
+  const paginatedData = useMemo(() => {
+    const currentPage = paginationState[viewMode];
+    const itemsPerPage = PAGINATION_CONFIG[viewMode];
+
+    if (viewMode === "timeline") {
+      // For timeline: paginate by date headers
+      const sortedDates = Object.keys(groupedByDate).sort(
+        (a, b) => new Date(b).getTime() - new Date(a).getTime()
+      );
+
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const paginatedDates = sortedDates.slice(startIndex, endIndex);
+
+      const paginatedGroupedImages: { [key: string]: ImageDataProps[] } = {};
+      paginatedDates.forEach((date) => {
+        paginatedGroupedImages[date] = groupedByDate[date];
+      });
+
+      return {
+        images: filteredAndSortedImages,
+        groupedImages: paginatedGroupedImages,
+        totalPages: Math.ceil(sortedDates.length / itemsPerPage),
+        totalItems: sortedDates.length,
+      };
+    } else {
+      // For carousel and grid: paginate by images
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const paginatedImages = filteredAndSortedImages.slice(
+        startIndex,
+        endIndex
+      );
+
+      return {
+        images: paginatedImages,
+        groupedImages: groupedByDate,
+        totalPages: Math.ceil(filteredAndSortedImages.length / itemsPerPage),
+        totalItems: filteredAndSortedImages.length,
+      };
+    }
+  }, [filteredAndSortedImages, groupedByDate, viewMode, paginationState]);
+
+  // Handle page change
+  const handlePageChange = (page: number) => {
+    setPaginationState((prev) => ({
+      ...prev,
+      [viewMode]: page,
+    }));
+  };
+
+  // Reset pagination when view mode or filters change
+  const handleViewModeChange = (newViewMode: ViewMode) => {
+    setViewMode(newViewMode);
+    setPaginationState((prev) => ({
+      ...prev,
+      [newViewMode]: 1,
+    }));
+  };
+
+  // Reset pagination when filters change
+  const resetPagination = () => {
+    setPaginationState({
+      carousel: 1,
+      grid: 1,
+      timeline: 1,
+    });
+  };
+
+  // Reset pagination when filters change
+  useMemo(() => {
+    resetPagination();
+  }, [selectedGroup, searchQuery, showFavoritesOnly, sortBy]);
+
   // Handlers
   const toggleFavorite = async (imageId: number | string) => {
     try {
@@ -150,7 +236,6 @@ export default function ImageGallery() {
   const handleImageUpdated = async (updatedImage: ImageDataProps) => {
     try {
       console.log("Image updated:", updatedImage);
-      // Refetch the images to get the updated data from the server
       await refetch();
     } catch (error) {
       console.error("Error refreshing images after update:", error);
@@ -214,12 +299,12 @@ export default function ImageGallery() {
 
   return (
     <div className="space-y-6 p-6">
-      <div className="content-card-light content-card-hover-light dark:content-card-dark dark:content-card-hover-dark rounded-2xl shadow-2xl">
+      <div className="content-card-light content-card-hover-light dark:content-card-light dark:content-card-hover-dark rounded-2xl shadow-2xl">
         <GalleryControls
           images={filteredAndSortedImages}
           groups={groups}
           viewMode={viewMode}
-          setViewMode={setViewMode}
+          setViewMode={handleViewModeChange}
           selectedGroup={selectedGroup}
           setSelectedGroup={setSelectedGroup}
           searchQuery={searchQuery}
@@ -232,43 +317,58 @@ export default function ImageGallery() {
         />
       </div>
 
-      <div className="content-card-light content-card-hover-light dark:content-card-dark dark:content-card-hover-dark rounded-2xl overflow-hidden shadow-2xl">
+      <div className="content-card-light content-card-hover-light dark:content-card-light dark:content-card-hover-dark rounded-2xl overflow-hidden shadow-2xl">
         {viewMode === "carousel" && (
           <CarouselView
-            images={filteredAndSortedImages}
+            images={paginatedData.images}
             groups={groups}
             onToggleFavorite={toggleFavorite}
             onEdit={handleEdit}
             onDelete={handleDelete}
             onChangeGroup={onChangeGroup}
             onImageUpdated={handleImageUpdated}
+            // Pagination props
+            currentPage={paginationState.carousel}
+            totalPages={paginatedData.totalPages}
+            totalItems={paginatedData.totalItems}
+            onPageChange={handlePageChange}
           />
         )}
         {viewMode === "grid" && (
           <GridView
-            images={filteredAndSortedImages}
+            images={paginatedData.images}
             groups={groups}
             onToggleFavorite={toggleFavorite}
             onEdit={handleEdit}
             onDelete={handleDelete}
             onChangeGroup={onChangeGroup}
             onImageUpdated={handleImageUpdated}
+            // Pagination props
+            currentPage={paginationState.grid}
+            totalPages={paginatedData.totalPages}
+            totalItems={paginatedData.totalItems}
+            onPageChange={handlePageChange}
           />
         )}
         {viewMode === "timeline" && (
           <TimelineView
-            groupedImages={groupedByDate}
+            groupedImages={paginatedData.groupedImages}
             groups={groups}
             onToggleFavorite={toggleFavorite}
             onEdit={handleEdit}
             onDelete={handleDelete}
             onChangeGroup={onChangeGroup}
             onImageUpdated={handleImageUpdated}
+            // Pagination props
+            currentPage={paginationState.timeline}
+            totalPages={paginatedData.totalPages}
+            totalItems={paginatedData.totalItems}
+            onPageChange={handlePageChange}
           />
         )}
 
         {/* Empty state */}
-        {filteredAndSortedImages.length === 0 && !loading && (
+        {paginatedData.totalItems === 0 && !loading && (
           <div className="flex flex-col items-center justify-center py-20 px-6">
             <div className="p-4 bg-romantic-500/20 dark:bg-romantic-500/30 rounded-full mb-4">
               <ImageIcon className="h-12 w-12 text-romantic-400 dark:text-romantic-400" />
@@ -283,27 +383,18 @@ export default function ImageGallery() {
             </p>
           </div>
         )}
-
-        {/* Load More Button */}
-        {hasMore && !loading && filteredAndSortedImages.length > 0 && (
-          <div className="flex justify-center p-6">
-            <button
-              onClick={loadMore}
-              disabled={loading}
-              className="px-6 py-3 bg-romantic-500 hover:bg-romantic-600 dark:bg-romantic-400 dark:hover:bg-romantic-500 disabled:bg-romantic-500/50 dark:disabled:bg-romantic-400/50 text-white rounded-lg transition-colors flex items-center gap-2"
-            >
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-              {loading ? "Loading..." : "Load More Photos"}
-            </button>
-          </div>
-        )}
       </div>
 
       {/* Pagination Info */}
-      {pagination && filteredAndSortedImages.length > 0 && (
+      {paginatedData.totalItems > 0 && (
         <div className="text-center text-sm text-gray-500 dark:text-slate-400">
-          Showing {filteredAndSortedImages.length} of {pagination.totalImages}{" "}
-          photos
+          {viewMode === "timeline"
+            ? `Showing ${Object.keys(paginatedData.groupedImages).length} of ${
+                paginatedData.totalItems
+              } date${paginatedData.totalItems !== 1 ? "s" : ""}`
+            : `Showing ${paginatedData.images.length} of ${
+                filteredAndSortedImages.length
+              } photo${filteredAndSortedImages.length !== 1 ? "s" : ""}`}
         </div>
       )}
     </div>

@@ -436,36 +436,6 @@ input:focus-visible {
   transform: scale(0.95);
 }
 
-/* Romantic gradient backgrounds */
-.bg-romantic-light {
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, rgb(255 240 245) 80%, transparent) 0%,
-    color-mix(in srgb, rgb(255 228 230) 60%, transparent) 25%,
-    color-mix(in srgb, rgb(254 202 202) 40%, transparent) 50%,
-    color-mix(in srgb, rgb(252 165 165) 30%, transparent) 75%,
-    color-mix(in srgb, rgb(251 113 133) 20%, transparent) 100%
-  );
-}
-
-.bg-romantic-hover {
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, rgb(255 228 230) 90%, transparent) 0%,
-    color-mix(in srgb, rgb(254 202 202) 70%, transparent) 25%,
-    color-mix(in srgb, rgb(252 165 165) 50%, transparent) 50%,
-    color-mix(in srgb, rgb(251 113 133) 40%, transparent) 75%,
-    color-mix(in srgb, rgb(244 63 94) 30%, transparent) 100%
-  );
-}
-.dark .bg-romantic-light {
-  background: none; /* Xóa gradient trong dark mode */
-}
-
-.bg-sidebar-dark {
-  background-color: rgba(15, 23, 42, 0.95); /* slate-900/95 */
-  background-image: none;
-}
 
 .gallery-loading-light {
   background: linear-gradient(

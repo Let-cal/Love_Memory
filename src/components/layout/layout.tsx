@@ -1,5 +1,6 @@
 "use client";
 
+import { useSidebar } from "@/components/providers/sidebar-context";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetTrigger } from "@/components/ui/sheet";
 import { Sidebar } from "@/components/ui/SideBar";
@@ -15,7 +16,7 @@ export function Layout({
   children,
   videoSrc = "/love_background.mp4",
 }: LayoutProps) {
-  const [sidebarExpanded, setSidebarExpanded] = useState(false); // Collapsed by default on mobile
+  const { expanded } = useSidebar();
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [videoError, setVideoError] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -100,13 +101,10 @@ export function Layout({
         <div
           className={`
             hidden lg:block transition-all duration-300 ease-in-out
-            ${sidebarExpanded ? "w-80" : "w-20"}
+            ${expanded ? "w-80" : "w-20"}
           `}
         >
-          <Sidebar
-            expanded={sidebarExpanded}
-            onToggle={() => setSidebarExpanded(!sidebarExpanded)}
-          />
+          <Sidebar />
         </div>
 
         {/* Mobile Sidebar Trigger */}
@@ -123,7 +121,7 @@ export function Layout({
               </Button>
             </SheetTrigger>
 
-            <Sidebar expanded={true} onToggle={() => {}} />
+            <Sidebar />
           </Sheet>
         </div>
 

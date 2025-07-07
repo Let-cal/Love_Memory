@@ -1,5 +1,6 @@
 "use client";
 
+import { useImageGroups } from "@/components/providers/ImageGroupsContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,8 +36,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Calendar,
   Camera,
+  File,
   FolderOpen,
   Loader2,
+  Maximize,
   Plus,
   Tag,
   X,
@@ -72,7 +75,8 @@ export function EditImageDialog({
   const [tagInput, setTagInput] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  const { groups, isLoading: groupsLoading, addGroup } = useGetImageGroups();
+  const { addGroup } = useGetImageGroups(isOpen);
+  const { groups, isLoading: groupsLoading, refetch } = useImageGroups();
   const { createGroup, isCreating } = useCreateImageGroup();
   const { updateImage, isUpdating } = useUpdateImage();
 
@@ -118,6 +122,7 @@ export function EditImageDialog({
         setNewGroupName("");
         setShowCreateGroup(false);
         toast.success("Group created successfully");
+        refetch();
       }
     } catch (error) {
       console.error("Error creating group:", error);
@@ -168,6 +173,20 @@ export function EditImageDialog({
   };
 
   if (!image) return null;
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return "0 B";
+    const units = ["B", "KB", "MB", "GB"];
+    let size = bytes;
+    let unitIndex = 0;
+
+    while (size >= 1024 && unitIndex < units.length - 1) {
+      size /= 1024;
+      unitIndex++;
+    }
+
+    return `${size.toFixed(2)} ${units[unitIndex]}`;
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -221,116 +240,116 @@ export function EditImageDialog({
                   Album
                 </h3>
               </div>
-
-              <FormField
-                control={form.control}
-                name="groupId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-pink-600 dark:text-pink-400">
-                      Current Album
-                    </FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value}
-                      disabled={groupsLoading}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="bg-white dark:bg-gray-800 border-pink-400 dark:border-pink-600 text-gray-800 dark:text-gray-200 focus:ring-pink-500">
-                          <SelectValue placeholder="Select an album" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className="bg-white dark:bg-gray-800 border-pink-400 dark:border-pink-600 text-gray-800 dark:text-gray-200">
-                        <SelectItem
-                          value="ungrouped"
-                          className="hover:bg-pink-100 dark:hover:bg-pink-900"
-                        >
-                          <div className="flex items-center gap-2">
-                            <FolderOpen className="h-4 w-4" />
-                            <span>Ungrouped</span>
-                          </div>
-                        </SelectItem>
-                        {groups.map((group) => (
+              <div className="flex flex-row items-end gap-4">
+                <FormField
+                  control={form.control}
+                  name="groupId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-pink-600 dark:text-pink-400">
+                        Current Album
+                      </FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        disabled={groupsLoading}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="bg-white dark:bg-gray-800 border-pink-400 dark:border-pink-600 text-gray-800 dark:text-gray-200 focus:ring-pink-500">
+                            <SelectValue placeholder="Select an album" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="bg-white dark:bg-gray-800 border-pink-400 dark:border-pink-600 text-gray-800 dark:text-gray-200">
                           <SelectItem
-                            key={group.id}
-                            value={group.id}
+                            value="ungrouped"
                             className="hover:bg-pink-100 dark:hover:bg-pink-900"
                           >
-                            <div className="flex items-center justify-between w-full">
-                              <div className="flex items-center gap-2">
-                                <FolderOpen className="h-4 w-4 text-pink-500" />
-                                <span>{group.name}</span>
-                              </div>
-                              {group.imageCount && (
-                                <Badge
-                                  variant="secondary"
-                                  className="bg-pink-200 dark:bg-pink-800 text-pink-800 dark:text-pink-200"
-                                >
-                                  {group.imageCount}
-                                </Badge>
-                              )}
+                            <div className="flex items-center gap-2">
+                              <FolderOpen className="h-4 w-4" />
+                              <span>Ungrouped</span>
                             </div>
                           </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                          {groups.map((group) => (
+                            <SelectItem
+                              key={group.id}
+                              value={group.id}
+                              className="hover:bg-pink-100 dark:hover:bg-pink-900"
+                            >
+                              <div className="flex items-center justify-between w-full">
+                                <div className="flex items-center gap-2">
+                                  <FolderOpen className="h-4 w-4 text-pink-500" />
+                                  <span>{group.name}</span>
+                                </div>
+                                {group.imageCount && (
+                                  <Badge
+                                    variant="secondary"
+                                    className="bg-pink-200 dark:bg-pink-800 text-pink-800 dark:text-pink-200"
+                                  >
+                                    {group.imageCount}
+                                  </Badge>
+                                )}
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <div className="space-y-3">
-                {!showCreateGroup ? (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowCreateGroup(true)}
-                    className="w-full bg-transparent text-pink-600 border-pink-400 hover:bg-pink-100 dark:text-pink-400 dark:border-pink-600 dark:hover:bg-pink-900 transition-transform duration-200 hover:scale-105 btn-light dark:btn-light"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Create New Album
-                  </Button>
-                ) : (
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Album name"
-                      value={newGroupName}
-                      onChange={(e) => setNewGroupName(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          handleCreateGroup();
-                        }
-                      }}
-                      className="bg-white dark:bg-gray-800 border-pink-400 dark:border-pink-600 text-gray-800 dark:text-gray-200 focus:ring-pink-500"
-                    />
-                    <Button
-                      type="button"
-                      size="sm"
-                      onClick={handleCreateGroup}
-                      disabled={isCreating || !newGroupName.trim()}
-                      className={`bg-pink-500 text-white hover:bg-pink-600 dark:bg-pink-600 dark:hover:bg-pink-700 transition-transform duration-200 hover:scale-105 ${
-                        isCreating ? "cursor-not-allowed" : ""
-                      } btn-light dark:btn-light`}
-                    >
-                      {isCreating ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Plus className="h-4 w-4" />
-                      )}
-                    </Button>
+                <div className="flex-1 flex flex-col justify-end">
+                  {!showCreateGroup ? (
                     <Button
                       type="button"
                       variant="outline"
-                      size="sm"
-                      onClick={() => setShowCreateGroup(false)}
-                      className="border-pink-400 text-pink-600 hover:bg-pink-100 dark:border-pink-600 dark:text-pink-400 dark:hover:bg-pink-900 transition-transform duration-200 hover:scale-105"
+                      onClick={() => setShowCreateGroup(true)}
+                      className="w-full bg-transparent text-pink-600 border-pink-400 hover:bg-pink-100 dark:text-pink-400 dark:border-pink-600 dark:hover:bg-pink-900 transition-transform duration-200 hover:scale-105 btn-light dark:btn-light"
                     >
-                      <X className="h-4 w-4" />
+                      <Plus className="h-4 w-4 mr-2" />
+                      Create New Album
                     </Button>
-                  </div>
-                )}
+                  ) : (
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Album name"
+                        value={newGroupName}
+                        onChange={(e) => setNewGroupName(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            handleCreateGroup();
+                          }
+                        }}
+                        className="bg-white dark:bg-gray-800 border-pink-400 dark:border-pink-600 text-gray-800 dark:text-gray-200 focus:ring-pink-500"
+                      />
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={handleCreateGroup}
+                        disabled={isCreating || !newGroupName.trim()}
+                        className={`bg-pink-500 text-white hover:bg-pink-600 dark:bg-pink-600 dark:hover:bg-pink-700 transition-transform duration-200 hover:scale-105 ${
+                          isCreating ? "cursor-not-allowed" : ""
+                        } btn-light dark:btn-light`}
+                      >
+                        {isCreating ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Plus className="h-4 w-4" />
+                        )}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowCreateGroup(false)}
+                        className="border-pink-400 text-pink-600 hover:bg-pink-100 dark:border-pink-600 dark:text-pink-400 dark:hover:bg-pink-900 transition-transform duration-200 hover:scale-105"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -392,11 +411,13 @@ export function EditImageDialog({
               </div>
               {image.metadata?.size && (
                 <div className="flex items-center gap-2">
-                  <span>Size: {image.formattedSize}</span>
+                  <File className="h-4 w-4 text-pink-500" />
+                  <span>Size: {formatFileSize(image.metadata.size)}</span>
                 </div>
               )}
               {image.metadata?.width && image.metadata?.height && (
                 <div className="flex items-center gap-2">
+                  <Maximize className="h-4 w-4 text-pink-500" />
                   <span>
                     Dimensions: {image.metadata.width} × {image.metadata.height}
                   </span>
