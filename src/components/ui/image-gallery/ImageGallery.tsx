@@ -299,7 +299,7 @@ export default function ImageGallery() {
 
   return (
     <div className="space-y-6 p-6">
-      <div className="content-card-light content-card-hover-light dark:content-card-light dark:content-card-hover-dark rounded-2xl shadow-2xl">
+      <div className="content-card-light content-card-hover-light dark:content-card-light rounded-2xl shadow-2xl">
         <GalleryControls
           images={filteredAndSortedImages}
           groups={groups}

@@ -117,3 +117,77 @@ export interface TimelineGroupedImages {
 
 export type ViewMode = "carousel" | "grid" | "timeline";
 export type SortBy = "date" | "group" | "favorites" | "name";
+
+export interface WebLinkDataProps {
+  _id: string;
+  title: string;
+  url: string;
+  description?: string;
+  tags: string[];
+  category: "memories" | "gifts" | "letters" | "moments" | "other";
+  backgroundColor?: string;
+  textColor?: string;
+  visitCount: number;
+  lastVisited?: string;
+  createdAt: string;
+  updatedAt: string;
+  isActive: boolean;
+  metadata?: {
+    siteName?: string;
+    siteDescription?: string;
+    favicon?: string;
+    previewImage?: string;
+  };
+
+  // Image-related fields from aggregation
+  imageCount?: number;
+  firstImage?: ImageDataProps | null; // The primary thumbnail image
+  recentImages?: ImageDataProps[]; // Up to 3 recent images
+}
+
+// WebLink view component props
+export interface WebLinkViewProps {
+  webLinks: WebLinkDataProps[];
+  onVisitLink: (webLinkId: string) => void;
+  onEditLink?: (webLink: WebLinkDataProps) => void;
+  onDeleteLink?: (webLinkId: string) => void;
+}
+
+
+// WebLink filters
+export interface WebLinkFilters {
+  category?: string;
+  tags?: string[];
+  search?: string;
+  limit?: number;
+  offset?: number;
+  sortBy?: "createdAt" | "visitCount" | "lastVisited" | "title";
+  sortOrder?: "asc" | "desc";
+  includeInactive?: boolean;
+}
+
+// WebLink statistics
+export interface WebLinkStatistics {
+  categories: Array<{ _id: string; count: number }>;
+  popularTags: Array<{ name: string; count: number }>;
+  overview: {
+    totalLinks: number;
+    totalVisits: number;
+    avgVisitsPerLink: number;
+    lastUpdated: Date;
+  };
+}
+
+// API response for WebLinks
+export interface WebLinksResponse {
+  webLinks: WebLinkDataProps[];
+  pagination: {
+    total: number;
+    limit: number;
+    offset: number;
+    hasMore: boolean;
+    totalPages: number;
+    currentPage: number;
+  };
+  statistics: WebLinkStatistics;
+}

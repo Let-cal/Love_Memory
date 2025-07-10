@@ -283,12 +283,14 @@ function validateFiles(files: File[]): string | null {
 function extractFormMetadata(formData: FormData) {
   const caption = (formData.get("caption") as string) || "";
   const groupId = (formData.get("groupId") as string) || null;
+  const webLinkId = (formData.get("webLinkId") as string) || null;
   const tags = (formData.get("tags") as string) || "";
   const tagsArray = tags ? tags.split(",").map((tag) => tag.trim()) : [];
 
   return {
     caption,
     groupId: groupId === "null" ? null : groupId,
+    webLinkId: webLinkId === "null" ? null : webLinkId,
     tagsArray,
   };
 }
@@ -320,6 +322,7 @@ async function processFileUploads(
   metadata: {
     caption: string;
     groupId: string | null;
+    webLinkId: string | null;
     tagsArray: string[];
   }
 ) {
@@ -344,6 +347,11 @@ async function processFileUploads(
         group:
           metadata.groupId && mongoose.Types.ObjectId.isValid(metadata.groupId)
             ? new mongoose.Types.ObjectId(metadata.groupId)
+            : null,
+        webLinkId:
+          metadata.webLinkId &&
+          mongoose.Types.ObjectId.isValid(metadata.webLinkId)
+            ? new mongoose.Types.ObjectId(metadata.webLinkId)
             : null,
         takenAt: new Date(),
         metadata: {

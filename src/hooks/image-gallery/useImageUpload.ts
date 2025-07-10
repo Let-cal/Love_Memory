@@ -26,6 +26,7 @@ export interface UploadedImage {
 export interface UploadOptions {
   caption?: string;
   groupId?: string;
+  webLinkId?: string;
   tags?: string[];
   onProgress?: (progress: number) => void;
   onSuccess?: (images: UploadedImage[]) => void;
@@ -123,6 +124,7 @@ export const useImageUpload = () => {
 
       if (options.caption) formData.append("caption", options.caption);
       if (options.groupId) formData.append("groupId", options.groupId);
+      if (options.webLinkId) formData.append("webLinkId", options.webLinkId);
       if (options.tags) formData.append("tags", options.tags.join(","));
 
       return formData;

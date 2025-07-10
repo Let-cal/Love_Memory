@@ -32,6 +32,7 @@ import { useCreateImageGroup } from "@/hooks/image-gallery/useCreateImageGroup";
 import { useGetImageGroups } from "@/hooks/image-gallery/useGetImageGroups";
 import { useUpdateImage } from "@/hooks/image-gallery/useUpdateImage";
 import { ImageDataProps } from "@/types/types";
+import { getBtnLightClasses } from "@/types/ui-utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Calendar,
@@ -275,7 +276,7 @@ export function EditImageDialog({
                               value={group.id}
                               className="hover:bg-pink-100 dark:hover:bg-pink-900"
                             >
-                              <div className="flex items-center justify-between w-full">
+                              <div className="flex items-center justify-between w-full gap-2">
                                 <div className="flex items-center gap-2">
                                   <FolderOpen className="h-4 w-4 text-pink-500" />
                                   <span>{group.name}</span>
@@ -302,9 +303,8 @@ export function EditImageDialog({
                   {!showCreateGroup ? (
                     <Button
                       type="button"
-                      variant="outline"
                       onClick={() => setShowCreateGroup(true)}
-                      className="w-full bg-transparent text-pink-600 border-pink-400 hover:bg-pink-100 dark:text-pink-400 dark:border-pink-600 dark:hover:bg-pink-900 transition-transform duration-200 hover:scale-105 btn-light dark:btn-light"
+                      className={"w-full" + getBtnLightClasses()}
                     >
                       <Plus className="h-4 w-4 mr-2" />
                       Create New Album
@@ -330,7 +330,7 @@ export function EditImageDialog({
                         disabled={isCreating || !newGroupName.trim()}
                         className={`bg-pink-500 text-white hover:bg-pink-600 dark:bg-pink-600 dark:hover:bg-pink-700 transition-transform duration-200 hover:scale-105 ${
                           isCreating ? "cursor-not-allowed" : ""
-                        } btn-light dark:btn-light`}
+                        } btn-light`}
                       >
                         {isCreating ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
@@ -430,10 +430,9 @@ export function EditImageDialog({
         <DialogFooter>
           <Button
             type="button"
-            variant="outline"
             onClick={onClose}
             disabled={isUpdating}
-            className="border-pink-400 text-pink-600 hover:bg-pink-100 dark:border-pink-600 dark:text-pink-400 dark:hover:bg-pink-900 transition-transform duration-200 hover:scale-105 btn-light dark:btn-light"
+            className={getBtnLightClasses()}
           >
             Cancel
           </Button>
@@ -441,7 +440,7 @@ export function EditImageDialog({
             type="submit"
             onClick={form.handleSubmit(onSubmit)}
             disabled={isUpdating}
-            className="bg-pink-500 text-white hover:bg-pink-600 dark:bg-pink-600 dark:hover:bg-pink-700 transition-transform duration-200 hover:scale-105 btn-light dark:btn-light"
+            className={getBtnLightClasses()}
           >
             {isUpdating ? (
               <>

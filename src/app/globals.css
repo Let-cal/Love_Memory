@@ -132,11 +132,11 @@ p {
   box-shadow: 0 25px 50px -12px color-mix(in srgb, rgb(251 207 232) 30%, transparent);
 }
 
-.content-card-hover-dark {
+.dark .content-card-hover-light {
   transition: all 0.3s ease-out;
 }
 
-.content-card-hover-dark:hover {
+.dark .content-card-hover-light:hover {
   background-color: color-mix(in srgb, rgb(15 23 42) 90%, transparent);
   border-color: color-mix(in srgb, rgb(100 116 139) 30%, transparent);
   box-shadow: 0 25px 50px -12px color-mix(in srgb, rgb(30 41 59) 30%, transparent);
@@ -160,7 +160,7 @@ p {
 .dark .content-card-light {
   background-color: rgba(15, 23, 42, 0.95); /* slate-900/95 */
   backdrop-filter: blur(12px);
-  border: 1px solid color-mix(in srgb, rgb(71 85 105) 30%, transparent);
+  background: none;
   box-shadow: 0 10px 15px -3px color-mix(in srgb, rgb(30 41 59) 40%, transparent);
 }
 
@@ -278,6 +278,7 @@ input:focus-visible {
   background-color: color-mix(in srgb, rgb(252 231 243) 70%, transparent);
   color: rgb(31 41 55);
   border-color: color-mix(in srgb, rgb(244 114 182) 60%, transparent);
+  
 }
 
 .dark .btn-light {
@@ -391,6 +392,7 @@ input:focus-visible {
   color: rgb(31 41 55);
 }
 
+
 .text-light-secondary {
   color: rgb(75 85 99);
 }
@@ -435,7 +437,6 @@ input:focus-visible {
   background-color: color-mix(in srgb, rgb(157 23 77) 50%, transparent);
   transform: scale(0.95);
 }
-
 
 .gallery-loading-light {
   background: linear-gradient(

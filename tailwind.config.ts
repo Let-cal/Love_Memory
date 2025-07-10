@@ -1,11 +1,18 @@
 /** @type {import('tailwindcss').Config} */
+import plugin from "tailwindcss/plugin";
+
 module.exports = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
-  darkMode: "class", // This is crucial for dark mode to work
+  darkMode: "class", // Enables dark mode with the 'dark' class
+  safelist: [
+    "btn-light",
+    "input-base",
+    // Add other custom classes if needed
+  ],
   theme: {
     extend: {
       colors: {
@@ -49,7 +56,6 @@ module.exports = {
           4: "hsl(var(--chart-4))",
           5: "hsl(var(--chart-5))",
         },
-        // Add your custom romantic colors
         romantic: {
           50: "#fef7f7",
           100: "#fef0f0",
@@ -88,5 +94,67 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    plugin(function ({ addComponents, theme }) {
+      addComponents({
+        // Custom btn-light utility
+        ".btn-light": {
+          backgroundColor:
+            "color-mix(in srgb, rgb(253 242 248) 50%, transparent)",
+          color: "rgb(55 65 81)",
+          border:
+            "1px solid color-mix(in srgb, rgb(251 207 232) 40%, transparent)",
+          transitionProperty: "all, transform",
+          transitionDuration: "200ms",
+          transitionTimingFunction: "ease-out",
+          "&:hover": {
+            backgroundColor:
+              "color-mix(in srgb, rgb(252 231 243) 70%, transparent)",
+            color: "rgb(31 41 55)",
+            borderColor:
+              "color-mix(in srgb, rgb(244 114 182) 60%, transparent)",
+            transform: "scale(1.05)",
+          },
+          ".dark &": {
+            backgroundColor:
+              "color-mix(in srgb, rgb(15 23 42) 50%, transparent)",
+            color: "rgb(252 231 243)",
+            border:
+              "1px solid color-mix(in srgb, rgb(157 23 77) 40%, transparent)",
+            "&:hover": {
+              backgroundColor:
+                "color-mix(in srgb, rgb(131 24 67) 40%, transparent)",
+              color: "rgb(251 207 232)",
+              borderColor:
+                "color-mix(in srgb, rgb(219 39 119) 60%, transparent)",
+              transform: "scale(1.05)",
+            },
+          },
+        },
+        // Custom input-base utility
+        ".input-base": {
+          backgroundColor: theme("colors.white"),
+          borderColor: theme("colors.pink.400"),
+          color: theme("colors.gray.800"),
+          transitionProperty: "all",
+          transitionDuration: "200ms",
+          transitionTimingFunction: "ease-out",
+          "&:focus": {
+            outline: "none",
+            ringColor: theme("colors.pink.500"),
+            ringWidth: "2px",
+            ringOffsetWidth: "2px",
+          },
+          ".dark &": {
+            backgroundColor: theme("colors.gray.800"),
+            borderColor: theme("colors.pink.600"),
+            color: theme("colors.gray.200"),
+            "&:focus": {
+              ringColor: theme("colors.pink.500"),
+            },
+          },
+        },
+      });
+    }),
+  ],
 };

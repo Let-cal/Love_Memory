@@ -6,6 +6,7 @@ export interface IImage extends mongoose.Document {
   cloudinaryPublicId: string;
   caption?: string;
   group?: mongoose.Types.ObjectId | null;
+  webLinkId?: mongoose.Types.ObjectId | null;
   createdAt: Date;
   updatedAt: Date;
   takenAt?: Date;
@@ -50,6 +51,11 @@ const imageSchema = new mongoose.Schema<IImage>(
       ref: "ImageGroup",
       default: null,
     },
+     webLinkId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "WebLink",
+      default: null,
+    },
     takenAt: {
       type: Date,
       default: Date.now,
@@ -87,6 +93,7 @@ imageSchema.index({ isFavorite: 1, createdAt: -1 });
 imageSchema.index({ tags: 1 });
 imageSchema.index({ takenAt: -1 });
 imageSchema.index({ caption: "text" }); // Text search index
+imageSchema.index({ webLinkId: 1, createdAt: -1 });
 
 // Virtual for formatted file size
 imageSchema.virtual("formattedSize").get(function () {

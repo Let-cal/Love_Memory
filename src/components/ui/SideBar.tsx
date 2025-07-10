@@ -36,7 +36,7 @@ export function Sidebar({ className }: SidebarProps) {
 
   // Mobile sidebar content
   const MobileSidebarContent = () => (
-    <div className="flex flex-col h-full content-card-light dark:content-card-light text-gray-800 dark:text-white">
+    <div className="flex flex-col h-full content-card-light dark:content-card-light">
       <VisuallyHidden>
         <SheetTitle>Sidebar Navigation</SheetTitle> {/* Thêm SheetTitle ẩn */}
       </VisuallyHidden>
@@ -111,7 +111,7 @@ function SidebarHeader({
           </div>
           {expanded && (
             <div className="overflow-hidden">
-              <h1 className="text-xl font-bold text-gray-800 dark:text-white truncate">
+              <h1 className="text-xl font-bold text-foreground truncate">
                 Love Memory
               </h1>
               <p className="text-xs text-pink-600/80 dark:text-pink-400/70 truncate">
@@ -171,7 +171,7 @@ function SidebarContent({
   return (
     <div className="p-4 space-y-2">
       {expanded && (
-        <h2 className="text-sm font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider mb-4">
+        <h2 className="text-sm font-semibold text-primary uppercase tracking-wider mb-4">
           Navigation
         </h2>
       )}
@@ -283,7 +283,7 @@ function SidebarButton({
     <Button
       variant="ghost"
       className={cn(
-        "w-full justify-start text-gray-700 dark:text-white",
+        "w-full justify-start text-foreground",
         "hover:bg-pink-100/50 dark:hover:bg-slate-800/50",
         "transition-all duration-200 ease-in-out",
         "touch-manipulation",

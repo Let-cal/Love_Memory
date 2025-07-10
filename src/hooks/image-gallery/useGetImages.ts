@@ -11,6 +11,7 @@ export interface UseGetImagesParams
   extends Omit<GetImagesQuery, "page" | "limit"> {
   enabled?: boolean;
   limit?: number;
+  webLinkId?: string | null;
 }
 
 export interface UseGetImagesReturn {
@@ -45,6 +46,7 @@ export function useGetImages(
     tags,
     startDate,
     endDate,
+    webLinkId = null,
   } = params;
 
   const [images, setImages] = useState<IImage[]>([]);
@@ -76,6 +78,7 @@ export function useGetImages(
       if (tags) queryParams.set("tags", tags);
       if (startDate) queryParams.set("startDate", startDate);
       if (endDate) queryParams.set("endDate", endDate);
+      if (webLinkId === null) queryParams.set("webLinkId", "null");
 
       return queryParams.toString();
     },
@@ -89,6 +92,7 @@ export function useGetImages(
       tags,
       startDate,
       endDate,
+      webLinkId,
     ]
   );
 
@@ -165,7 +169,9 @@ export function useGetImages(
     tags,
     startDate,
     endDate,
+    webLinkId,
     enabled,
+    fetchImages,
   ]);
 
   // Initial fetch
@@ -173,7 +179,7 @@ export function useGetImages(
     if (enabled) {
       fetchImages(1, false);
     }
-  }, [enabled]);
+  }, [enabled, fetchImages]);
 
   return {
     images,

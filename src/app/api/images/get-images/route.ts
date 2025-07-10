@@ -16,6 +16,7 @@ export interface GetImagesQuery {
   tags?: string;
   startDate?: string;
   endDate?: string;
+  webLinkId?: string | null;
 }
 
 export interface GetImagesResponse {
@@ -53,6 +54,7 @@ export async function GET(request: NextRequest) {
     const tags = searchParams.get("tags");
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");
+    const webLinkId = searchParams.get("webLinkId");
 
     // Build query filter
     const filter: FilterQuery<IImage> = {};
@@ -64,6 +66,13 @@ export async function GET(request: NextRequest) {
       } else if (mongoose.Types.ObjectId.isValid(groupFilter)) {
         filter.group = new mongoose.Types.ObjectId(groupFilter);
       }
+    }
+
+    // WebLinkId filter
+    if (webLinkId === "null") {
+      filter.webLinkId = null; // Chỉ lấy hình ảnh không liên kết với WebLink
+    } else if (webLinkId && mongoose.Types.ObjectId.isValid(webLinkId)) {
+      filter.webLinkId = new mongoose.Types.ObjectId(webLinkId); // Lọc theo WebLink cụ thể nếu có
     }
 
     // Search filter (caption and tags)
